@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            Tuition Fee Calculator
+        </title>
+        <style>
+            body{background-color: lightcyan; padding: 10pt;}
+            table{padding: 10pt; border: 1pt;border-style: dotted; border-spacing: 10pt;}
+            .div1{padding: 10pt; max-width: 60%;background-color: beige;}
+            .div2{padding: 10pt; max-width: 60%;background-color:lightpink; font-family: Georgia, 'Times New Roman', Times, serif;border: 2pt,solid;text-align: center;}
+            .error{color: red;font-size: small;font-family: 'Courier New', Courier, monospace;}
+            .results{color: green;font-size: small;font-family: Georgia, 'Times New Roman', Times, serif;}
+        </style>
+    </head>
+    <body>
+        <h1> Tuition Fee Calculator</h1>
+        <br>
+        <p>This webpage calculates the Tuition Fee for the current semester adjusting discounts if any.</p>
+        <div class="div1"> 
+            <h2>Student Details</h2>
+            <br>
+            <p><i>Please complete the following fields</i></p>
+            <table>
+                <tr>
+                    <td>
+                        <label>Full Name:</label>
+                    </td>
+                    <td>
+                        <input type="text" id="name">
+                    </td>
+                    <td>
+                        <span id="err1" class="error"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Date of Birth(DOB):</label>
+                    </td>
+                    <td>
+                        <input type="date" id="date">
+                    </td>
+                    <td>
+                        <span  id="err2" class="error"></span>
+                        <span class="results"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td>
+                        <button onclick="calculateAge();">Calculate Age</button>
+                    </td>
+                    <td>
+                        <span id = "err5" class=""error></span>
+                    </td>
+                
+                </tr>
+                <tr>
+                   <td>
+                        <label>Homestate:</label>
+                    </td>
+                    <td> 
+                        <input type="text" id="state">
+                    </td>
+                    <td>
+                        <span id="err3" class="error"></span>
+                    </td>
+                </tr>
+                <tr> 
+                    <td> 
+                       <label>Number of courses registered</label> 
+                    </td>
+                    <td>
+                        <input type="text" id="courses">
+                    </td>
+                    <td>
+                        <span id="err4" class="error"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button onclick="clickClear();">Clear Inputs</button>
+                    
+                    
+                        <button onclick="clickValidate()">Validate Inputs</button>
+                    
+                    
+                        <button onclick="clickCalculate()">Calculate Tuition Fees</button>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+        <br><br>
+        <div class="div2">
+            <h2>Summary of Fees</h2>
+            <span id="a" class="results"></span><br>
+            <span id="b" class="results"></span><br>
+            <span id="c" class="results"></span><br>
+            <span id="d" class="results"></span><br>
+        </div>
+        <script>
+            let dob = null;
+            let age = null;
+            let name = "";
+            let num_courses = null; 
+            let state = ""; 
+
+            function validateText(text){
+                if ( text === null || text === ''){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            function validateNumber(num_text){
+                var num= parseInt(num_text);
+                if(num === NaN||num_text === null||num_text===''){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            function calculateAge() {
+                let dob_text = document.getElementById("date").value;
+
+                if (validateText(dob_text)) {
+                    dob = new Date(dob_text);
+                    const today = new Date();
+                    age = today.getFullYear() - dob.getFullYear();
+
+                    document.getElementById("err2").innerHTML = "";
+                    document.getElementById("err5").innerHTML = "Age: " + age + " years (approximate). ";
+                    return true; 
+                } else {
+                    document.getElementById("err2").innerHTML = " Choose/enter a date please!";
+                    document.getElementById("err5").innerHTML = "";
+                    return false; 
+                }
+
+            }
+            function clickValidate(){
+                let flag = true;
+                name = document.getElementById("name").value;
+                if(validateText(name)){
+                    document.getElementById("err1").innerHTML = " Enter a valid name please!";
+                    name = ""; 
+                    flag = false;
+                
+                }
+                if(!calculateAge()){
+                    flag = false;
+                
+                }
+                state = document.getElementById("state").value;
+                if(validateText(state)){
+                    document.getElementById("err3").innerHTML = " Enter a valid state please!";
+                    state = ""; 
+                    flag = false;  
+                
+                }
+                num_courses = document.getElementById("courses").value;
+                if(validateNumber(num_courses)){
+                    document.getElementById("err4").innerHTML = " Enter a valid number please!";
+                    num_courses = null;
+                    flag = false;
+                
+                }
+                if(flag){
+                    alert("Validation success.");
+                }
+                return flag;
+            }
+            function clickClear(){
+                document.getElementById("name").value = "";
+                document.getElementById("date").value = null;
+                document.getElementById("state").value = "";
+                document.getElementById("courses").value = ""; 
+                document.getElementById("err1").innerHTML = "";
+                document.getElementById("err2").innerHTML = "";
+                document.getElementById("err3").innerHTML = "";
+                document.getElementById("err4").innerHTML = "";
+                document.getElementById("err5").innerHTML = ""
+            }
+            function clickCalculate(){
+                num_courses=document.getElementById("courses").value;
+                state=document.getElementById("state").value;
+                name=document.getElementById("name").value;
+                let fees=1000*num_courses;
+
+                if(clickValidate()){
+                    if(state==="Goa"){
+                        fees=fees-(0.1*fees);
+                        document.getElementById("c").innerHTML="10% state discount";
+                    }else{
+                        document.getElementById("c").innerHTML="0% discount";
+                    }
+                    document.getElementById("a").innerHTML=name+" ("+age.toString() + "y)";
+                    document.getElementById("b").innerHTML="number of courses registered : "+num_courses.toString();
+                    
+                    document.getElementById("d").innerHTML="total tution:"+fees.toString();
+                }
+
+
+            }
+        </script>
+    </body>
+</html>
