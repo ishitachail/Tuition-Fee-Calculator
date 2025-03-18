@@ -14,6 +14,7 @@
             .results { color: green; font-size: small; font-family: Georgia, 'Times New Roman', Times, serif; }
             button { margin-top: 10px; padding: 5px 15px; cursor: pointer; }
         </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     </head>
     <body>
         <h1 style="text-align: center;"> Tuition Fee Calculator</h1>
@@ -39,7 +40,15 @@
                 </tr>
                 <tr>
                     <td><label>Homestate:</label></td>
-                    <td><input type="text" id="state"></td>
+                    <td>
+                        <select id="state">
+                            <option value="">Select State</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
+                    </td>
                     <td><span id="err3" class="error"></span></td>
                 </tr>
                 <tr> 
@@ -52,6 +61,7 @@
                         <button onclick="clickClear();">Clear Inputs</button>
                         <button onclick="clickValidate();">Validate Inputs</button>
                         <button onclick="clickCalculate();">Calculate Tuition Fees</button>
+                        <button onclick="downloadSummary();">Download Summary</button>
                     </td>
                 </tr>
             </table>
@@ -70,6 +80,13 @@
             let name = "";
             let num_courses = null; 
             let state = ""; 
+
+            const stateDiscounts = {
+                "Goa": 0.1,
+                "Maharashtra": 0.05,
+                "Karnataka": 0.08,
+                "Delhi": 0.02
+            };
 
             function validateText(text) {
                 return !(text === null || text.trim() === '');
@@ -112,7 +129,7 @@
 
                 state = document.getElementById("state").value;
                 if (!validateText(state)) {
-                    document.getElementById("err3").innerHTML = "Enter a valid state please!";
+                    document.getElementById("err3").innerHTML = "Select a valid state please!";
                     flag = false;  
                 } else {
                     document.getElementById("err3").innerHTML = "";
@@ -155,16 +172,30 @@
                 let fees = 1000 * parseInt(num_courses);
 
                 if (clickValidate()) {
-                    if (state.toLowerCase() === "goa") {
-                        fees = fees - (0.1 * fees);
-                        document.getElementById("c").innerHTML = "10% state discount applied.";
+                    if (state in stateDiscounts) {
+                        let discount = stateDiscounts[state] * fees;
+                        fees = fees - discount;
+                        document.getElementById("c").innerHTML = `${(stateDiscounts[state] * 100)}% discount applied for ${state}.`;
                     } else {
                         document.getElementById("c").innerHTML = "No discount available.";
                     }
                     document.getElementById("a").innerHTML = name + " (" + age.toString() + "y)";
                     document.getElementById("b").innerHTML = "Number of courses registered: " + num_courses.toString();
-                    document.getElementById("d").innerHTML = "Total tuition: $" + fees.toString();
+                    document.getElementById("d").innerHTML = "Total tuition: $" + fees.toFixed(2);
                 }
+            }
+
+            async function downloadSummary() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                let summary = `Student Name: ${name}\nAge: ${age} years\nState: ${state}\nNumber of Courses: ${num_courses}\n`;
+                summary += document.getElementById("c").innerText + "\n";
+                summary += document.getElementById("d").innerText;
+
+                doc.setFontSize(12);
+                doc.text(summary, 10, 10);
+                doc.save("Tuition_Fee_Summary.pdf");
             }
         </script>
     </body>
